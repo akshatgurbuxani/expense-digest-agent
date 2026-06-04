@@ -1,0 +1,20 @@
+{
+  "name": "@expense/workers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./composition-root": "./src/composition-root.ts",
+    "./job-handlers": "./src/job-handlers.ts"
+  },
+  "dependencies": {
+    "@expense/config": "*",
+    "@expense/core": "*",
+    "@expense/db": "*",
+    "@expense/delivery": "*",
+    "@expense/llm": "*",
+    "@expense/plaid": "*",
+    "@expense/queue": "*",
+    "@expense/wiring": "*"
+  }
+}

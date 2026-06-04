@@ -1,0 +1,22 @@
+# Test overrides (merged when NODE_ENV=test). Keeps unit/integration runs predictable.
+
+scheduler:
+  tickIntervalMs: 1000
+
+llm:
+  maxConcurrency: 1
+
+workers:
+  concurrency:
+    txn.sync: 1
+    txn.categorize: 1
+    anomaly.evaluate: 1
+    baseline.recompute: 1
+    digest.generate: 1
+    delivery.send: 1
+    mail.sync: 1
+    mail.fullSync: 1
+    mail.watch: 1
+    receipt.parse: 1
+    receipt.match: 1
+    report.generate: 1

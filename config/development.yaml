@@ -1,0 +1,8 @@
+# Development overrides (merged on top of default.yaml when NODE_ENV=development).
+
+workers:
+  concurrency:
+    txn.categorize: 1
+
+llm:
+  maxConcurrency: 2

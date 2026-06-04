@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "paths": {
+      "@expense/api/composition-root": ["apps/api/src/composition-root.ts"],
+      "@expense/api/job-handlers": ["apps/api/src/job-handlers.ts"],
+      "@expense/core": ["packages/core/src/index.ts"],
+      "@expense/core/testing": ["packages/core/src/testing/index.ts"],
+      "@expense/config": ["packages/config/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

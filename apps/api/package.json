@@ -1,0 +1,25 @@
+{
+  "name": "@expense/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./composition-root": "./src/composition-root.ts",
+    "./create-app": "./src/create-app.ts"
+  },
+  "dependencies": {
+    "@expense/config": "*",
+    "@expense/core": "*",
+    "@expense/db": "*",
+    "@expense/plaid": "*",
+    "@expense/wiring": "*",
+    "@expense/gmail": "*",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@expense/workers": "*",
+    "@types/express": "^5.0.0",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.0.0"
+  }
+}

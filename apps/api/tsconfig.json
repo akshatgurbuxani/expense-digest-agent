@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "paths": {
+      "@expense/core": ["packages/core/src/index.ts"],
+      "@expense/core/testing": ["packages/core/src/testing/index.ts"],
+      "@expense/config": ["packages/config/src/index.ts"],
+      "@expense/db": ["packages/db/src/index.ts"],
+      "@expense/db/testing": ["packages/db/src/testing/index.ts"],
+      "@expense/queue": ["packages/queue/src/index.ts"],
+      "@expense/queue/testing": ["packages/queue/src/testing/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "e2e/**/*.ts"]
+}

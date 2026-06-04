@@ -1,0 +1,12 @@
+{
+  "name": "@expense/scheduler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@expense/config": "*",
+    "@expense/core": "*",
+    "@expense/db": "*",
+    "@expense/wiring": "*"
+  }
+}

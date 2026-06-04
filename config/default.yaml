@@ -1,0 +1,75 @@
+# Non-secret application tunables. Secrets and connection strings live in .env only.
+# Layering: default.yaml → {NODE_ENV}.yaml → APP_CONFIG_DIR override path.
+# Validate at startup via packages/config (Zod).
+
+queue:
+  prefix: expense
+  maxAttempts: 3
+  backoff:
+    type: exponential
+    delayMs: 200
+
+workers:
+  # BullMQ concurrency per job queue (one Worker instance per job type).
+  concurrency:
+    txn.sync: 1
+    txn.categorize: 2
+    anomaly.evaluate: 1
+    baseline.recompute: 1
+    digest.generate: 1
+    delivery.send: 2
+    mail.sync: 2
+    mail.fullSync: 1
+    mail.watch: 1
+    receipt.parse: 2
+    receipt.match: 2
+    report.generate: 1
+
+scheduler:
+  tickIntervalMs: 60000
+
+llm:
+  maxConcurrency: 3
+
+anomaly:
+  priceIncreaseFactor: 1.5
+  duplicateWindowMs: 86400000 # 24h
+  unusualSigma: 3
+  minBaselineSamples: 4
+  merchantHistoryDays: 90
+
+digest:
+  minBaselineSamples: 4
+  flatThreshold: 0.05
+
+report:
+  monthlyDay: 1
+  deliveryHour: 9
+
+mail:
+  inboxLabelIds: ["INBOX"]
+  labelFilterBehavior: "INCLUDE"
+  fullSyncBackfillDays: 30
+  fullSyncQuery: "category:updates OR category:purchases OR subject:(order OR receipt OR invoice)"
+  classifier:
+    minConfidence: 0.75
+    llmFallback: true
+    blockBankCardAlerts: true
+  match:
+    windowDays: 5
+    amountToleranceMinorUnits: 100
+    minScore: 70
+    weights:
+      exactAmount: 40
+      nearAmount: 25
+      sameDay: 25
+      nearDay: 15
+      merchantFuzzy: 20
+      orderIdInMemo: 15
+      categoryBonus: 10
+  categoriesTriggerMatch:
+    - shopping
+    - subscriptions
+    - dining
+    - travel
+    - entertainment

@@ -1,0 +1,9 @@
+# Production overrides (merged on top of default.yaml when NODE_ENV=production).
+
+workers:
+  concurrency:
+    txn.categorize: 4
+    baseline.recompute: 2
+
+llm:
+  maxConcurrency: 5

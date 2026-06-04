@@ -1,0 +1,28 @@
+name: "Webhook to Digest (Happy Path)"
+description: "Single transaction from Plaid webhook flows through sync → categorize → baseline → digest → delivery"
+users:
+  - email: "test-user@example.com"
+    timezone: "UTC"
+    digestDay: "sunday"
+    deliveryPreference: "email"
+    plaidItemId: "plaid-item-heartbeat"
+    plaidAccountId: "plaid-acct-heartbeat"
+    syncPages:
+      - added:
+          - amount: 4500
+            merchantName: "Starbucks"
+            merchantNameRaw: "STARBUCKS STORE 123"
+            occurredAt: "2026-05-24T12:00:00.000Z"
+expected:
+  digestGenerated: true
+  digestContains:
+    - "$45.00"
+    - "other"
+  deliverySent: true
+  jobsEnqueued:
+    - "txn.sync"
+    - "txn.categorize"
+    - "baseline.recompute"
+    - "digest.generate"
+    - "delivery.send"
+  finalDigestCount: 1

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "expense-digest": {
+      "command": "npx",
+      "args": ["tsx", "apps/mcp-server/src/main.ts"],
+      "env": {
+        "MCP_ACCESS_TOKEN": "<run: npm run mint-mcp-token -- --user-id=USER_ID>"
+      }
+    }
+  }
+}

@@ -1,0 +1,76 @@
+name: "Default E2E Pipeline"
+description: "Full pipeline with Plaid sync, Gmail receipt matching, and multi-week digests for 2 users"
+users:
+  - email: user-1@example.com
+    timezone: America/Los_Angeles
+    digestDay: sunday
+    deliveryPreference: email
+    plaidItemId: plaid-item-1
+    plaidAccountId: plaid-acct-1
+    existingTransactions:
+      - amount: 6599
+        merchantName: Amazon
+        merchantNameRaw: AMAZON
+        category: shopping
+        occurredAt: "2026-05-20T12:00:00.000Z"
+      - amount: 8943
+        merchantName: Whole Foods Market
+        merchantNameRaw: WHOLEFOODSMARKET
+        category: groceries
+        occurredAt: "2026-05-20T14:00:00.000Z"
+    mailMessages:
+      - gmailMessageId: "user1-amazon-receipt"
+        threadId: "thread-user1-amazon"
+        receivedAt: "2026-05-20T18:00:00.000Z"
+        fromAddress: "Amazon <order-update@amazon.com>"
+        subject: "Your Amazon.com order has shipped"
+        snippet: "Package on the way"
+        textPlain: |
+          Order total: $65.99
+
+          Items:
+            Wireless Mouse $29.99
+            USB Hub $15.99
+            Screen Protector $9.99
+
+          Order URL: https://amazon.com/orders/USR1ABC
+        textHtml: null
+
+  - email: user-2@example.com
+    timezone: America/Los_Angeles
+    digestDay: sunday
+    deliveryPreference: email
+    plaidItemId: plaid-item-2
+    plaidAccountId: plaid-acct-2
+    existingTransactions:
+      - amount: 1599
+        merchantName: Netflix
+        merchantNameRaw: NETFLIX
+        category: subscriptions
+        occurredAt: "2026-05-21T10:00:00.000Z"
+      - amount: 1247
+        merchantName: Starbucks
+        merchantNameRaw: STARBUCKS
+        category: dining
+        occurredAt: "2026-05-21T08:00:00.000Z"
+    mailMessages:
+      - gmailMessageId: "user2-netflix-receipt"
+        threadId: "thread-user2-netflix"
+        receivedAt: "2026-05-21T12:00:00.000Z"
+        fromAddress: "Netflix <info@netflix.com>"
+        subject: "Your Netflix subscription receipt"
+        snippet: "Monthly charge"
+        textPlain: |
+          Your monthly subscription has been renewed.
+
+          Total: $15.99
+
+          Plan: Standard HD
+
+          Next billing: June 21, 2026
+        textHtml: null
+
+expected:
+  digestGenerated: true
+  deliverySent: true
+  finalDigestCount: 10
