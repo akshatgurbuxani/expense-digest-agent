@@ -34,7 +34,8 @@
     "demo:live": "tsx scripts/demo-receipt-live.ts",
     "scenario": "npx vitest run apps/api/e2e/scenario-runner.e2e.ts --reporter=verbose",
     "trace": "bash scripts/trace-user.sh",
-    "mint-mcp-token": "dotenv -e .env -- tsx scripts/mint-mcp-token.ts"
+    "mint-mcp-token": "dotenv -e .env -- tsx scripts/mint-mcp-token.ts",
+    "mint-api-token": "dotenv -e .env -- tsx scripts/mint-api-token.ts"
   },
   "devDependencies": {
     "@types/luxon": "^3.4.2",
