@@ -221,18 +221,20 @@ npm run dev:scheduler
 npm run dev:mcp         # needs MCP_ACCESS_TOKEN + Postgres
 ```
 
-Mint a session token for the web UI:
-```bash
-curl -s -X POST http://localhost:3000/api/auth/token \
-  -H 'Content-Type: application/json' \
-  -d '{"userId":"<your-user-uuid>"}' | jq -r .token
-```
-
 ### 3. Frontend
 
+Generate a user UUID, mint an auth token, and start the web UI:
+
 ```bash
-VITE_AUTH_TOKEN=<session-jwt> npm run dev:web   # http://localhost:5173
+USER_ID=$(node -e "process.stdout.write(crypto.randomUUID())")
+TOKEN=$(npm run mint-api-token --silent -- --user-id=$USER_ID)
+VITE_AUTH_TOKEN=$TOKEN npm run dev:web   # http://localhost:5173
 ```
+
+The app loads at `http://localhost:5173` and calls `/api/setup/status` to
+check account connections. You'll see the **Connect bank** and **Connect Gmail**
+buttons — clicking them requires real Plaid/Google credentials (they'll 500
+otherwise).
 
 ---
 
