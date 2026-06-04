@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "paths": {
+      "@expense/core": ["packages/core/src/index.ts"],
+      "@expense/core/testing": ["packages/core/src/testing/index.ts"],
+      "@expense/config": ["packages/config/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

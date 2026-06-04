@@ -1,0 +1,260 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String   @id @db.Uuid
+  email              String   @unique
+  timezone           String
+  digestDay          Int      @map("digest_day")
+  digestTime         String   @map("digest_time")
+  deliveryPreference String   @map("delivery_preference")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  items        PlaidItem[]
+  accounts     Account[]
+  transactions Transaction[]
+  baselines    SpendBaseline[]
+  digests      Digest[]
+  monthlyReports MonthlyReport[]
+  anomalies    Anomaly[]
+  mailAccounts MailAccount[]
+  mailMessages MailMessage[]
+  receipts     Receipt[]
+  receiptLinks TransactionReceiptLink[]
+
+  @@map("users")
+}
+
+model PlaidItem {
+  id                   String    @id @db.Uuid
+  userId               String    @map("user_id") @db.Uuid
+  plaidItemId          String    @unique @map("plaid_item_id")
+  accessTokenEncrypted String    @map("access_token_encrypted")
+  syncCursor           String?   @map("sync_cursor")
+  status               String
+  lastSyncedAt         DateTime? @map("last_synced_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accounts Account[]
+
+  @@index([userId])
+  @@map("plaid_items")
+}
+
+model Account {
+  id             String    @id @db.Uuid
+  itemId         String    @map("item_id") @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  plaidAccountId String    @map("plaid_account_id")
+  name           String
+  type           String
+  lastSyncedAt   DateTime? @map("last_synced_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item         PlaidItem     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([userId, plaidAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Transaction {
+  id                 String    @id @db.Uuid
+  accountId          String    @map("account_id") @db.Uuid
+  userId             String    @map("user_id") @db.Uuid
+  plaidTransactionId String    @unique @map("plaid_transaction_id")
+  amountMinorUnits   Int       @map("amount_minor_units")
+  currency           String
+  merchantNameRaw    String    @map("merchant_name_raw")
+  merchantName       String?   @map("merchant_name")
+  category           String?
+  plaidPfc           String?   @map("plaid_pfc")
+  isSubscription     Boolean   @default(false) @map("is_subscription")
+  isRecurring        Boolean   @default(false) @map("is_recurring")
+  occurredAt         DateTime  @map("occurred_at")
+  enrichedAt         DateTime? @map("enriched_at")
+  removedAt          DateTime? @map("removed_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  anomalies Anomaly[]
+  receiptLink TransactionReceiptLink?
+
+  @@index([userId])
+  @@index([userId, occurredAt])
+  @@map("transactions")
+}
+
+model MailAccount {
+  id                    String    @id @db.Uuid
+  userId                String    @map("user_id") @db.Uuid
+  gmailAddress          String    @unique @map("gmail_address")
+  refreshTokenEncrypted String    @map("refresh_token_encrypted")
+  status                String
+  historyId             String?   @map("history_id")
+  watchExpiresAt        DateTime? @map("watch_expires_at")
+  lastSyncedAt          DateTime? @map("last_synced_at")
+  connectedAt           DateTime  @default(now()) @map("connected_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mailMessages MailMessage[]
+
+  @@index([userId])
+  @@map("mail_accounts")
+}
+
+model MailMessage {
+  id               String   @id @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  mailAccountId    String   @map("mail_account_id") @db.Uuid
+  gmailMessageId   String   @map("gmail_message_id")
+  threadId         String   @map("thread_id")
+  receivedAt       DateTime @map("received_at")
+  fromAddress      String   @map("from_address")
+  fromDomain       String   @map("from_domain")
+  subject          String
+  processingStatus String   @map("processing_status")
+  ignoreReason     String?  @map("ignore_reason")
+  receiptKind      String?  @map("receipt_kind")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mailAccount MailAccount @relation(fields: [mailAccountId], references: [id], onDelete: Cascade)
+  receipt     Receipt?
+
+  @@unique([mailAccountId, gmailMessageId])
+  @@index([userId])
+  @@map("mail_messages")
+}
+
+model Receipt {
+  id                    String    @id @db.Uuid
+  userId                String    @map("user_id") @db.Uuid
+  mailMessageId         String    @unique @map("mail_message_id") @db.Uuid
+  kind                  String
+  merchantName          String    @map("merchant_name")
+  merchantDomain        String?   @map("merchant_domain")
+  orderId               String?   @map("order_id")
+  orderUrl              String?   @map("order_url")
+  totalAmountMinorUnits Int?      @map("total_amount_minor_units")
+  totalAmountCurrency   String?   @map("total_amount_currency")
+  occurredAt            DateTime? @map("occurred_at")
+  lineItemsJson         Json      @map("line_items_json")
+  extractedAt           DateTime  @map("extracted_at")
+  extractionSource      String    @map("extraction_source")
+  confidence            Float
+
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mailMessage MailMessage             @relation(fields: [mailMessageId], references: [id], onDelete: Cascade)
+  link        TransactionReceiptLink?
+
+  @@index([userId])
+  @@index([userId, extractedAt])
+  @@map("receipts")
+}
+
+model TransactionReceiptLink {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  transactionId String   @unique @map("transaction_id") @db.Uuid
+  receiptId     String   @unique @map("receipt_id") @db.Uuid
+  matchScore    Int      @map("match_score")
+  matchReason   String   @map("match_reason")
+  linkedAt      DateTime @map("linked_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  receipt     Receipt     @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, transactionId])
+  @@unique([userId, receiptId])
+  @@map("transaction_receipt_links")
+}
+
+model MerchantCategory {
+  id                 String   @id @default(uuid()) @db.Uuid
+  normalizedMerchant String   @unique @map("normalized_merchant")
+  merchantName       String   @map("merchant_name")
+  category           String
+  signalsJson        Json     @map("signals_json")
+  source             String
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("merchant_categories")
+}
+
+model SpendBaseline {
+  id                 String   @id @default(uuid()) @db.Uuid
+  userId             String   @map("user_id") @db.Uuid
+  category           String
+  period             String
+  meanMinorUnits     Int      @map("mean_minor_units")
+  medianMinorUnits   Int      @map("median_minor_units")
+  currency           String
+  stddevMinorUnits   Int      @map("stddev_minor_units")
+  sampleCount        Int      @map("sample_count")
+  computedAt         DateTime @map("computed_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category, period])
+  @@index([userId])
+  @@map("spend_baselines")
+}
+
+model Digest {
+  id          String    @id @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  weekStart   DateTime  @map("week_start")
+  weekEnd     DateTime  @map("week_end")
+  factsJson   Json      @map("facts_json")
+  subject     String
+  content     String
+  deliveredAt DateTime? @map("delivered_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("digests")
+}
+
+model MonthlyReport {
+  id          String    @id @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  yearMonth   String    @map("year_month")
+  monthStart  DateTime  @map("month_start")
+  monthEnd    DateTime  @map("month_end")
+  factsJson   Json      @map("facts_json")
+  subject     String
+  content     String
+  deliveredAt DateTime? @map("delivered_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, yearMonth])
+  @@index([userId])
+  @@map("monthly_reports")
+}
+
+model Anomaly {
+  id            String    @id @db.Uuid
+  transactionId String    @map("transaction_id") @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  reason        String
+  severity      String
+  detail        String
+  detectedAt    DateTime  @map("detected_at")
+  deliveredAt   DateTime? @map("delivered_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("anomalies")
+}
