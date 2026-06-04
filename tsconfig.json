@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@expense/core": ["packages/core/src/index.ts"],
+      "@expense/core/testing": ["packages/core/src/testing/index.ts"],
+      "@expense/core/testing/contracts": ["packages/core/src/testing/contracts/index.ts"],
+      "@expense/config": ["packages/config/src/index.ts"],
+      "@expense/db": ["packages/db/src/index.ts"],
+      "@expense/db/testing": ["packages/db/src/testing/index.ts"],
+      "@expense/queue": ["packages/queue/src/index.ts"],
+      "@expense/queue/testing": ["packages/queue/src/testing/index.ts"],
+      "@expense/plaid": ["packages/plaid/src/index.ts"],
+      "@expense/plaid/testing": ["packages/plaid/src/testing/index.ts"],
+      "@expense/llm": ["packages/llm/src/index.ts"],
+      "@expense/llm/testing": ["packages/llm/src/testing/index.ts"],
+      "@expense/delivery": ["packages/delivery/src/index.ts"],
+    "@expense/delivery/testing": ["packages/delivery/src/testing/index.ts"],
+    "@expense/gmail": ["packages/gmail/src/index.ts"],
+    "@expense/gmail/testing": ["packages/gmail/src/testing/index.ts"],
+    "@expense/wiring": ["packages/wiring/src/index.ts"]
+    }
+  },
+  "include": ["packages/*/src/**/*.ts", "apps/api/src/**/*.ts", "apps/workers/src/**/*.ts", "apps/scheduler/src/**/*.ts", "apps/mcp-server/src/**/*.ts", "apps/**/e2e/**/*.ts"]
+}

@@ -1,0 +1,52 @@
+{
+  "name": "expense-digest-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Proactive, narrative weekly expense digest backend. Event-driven, ports-and-adapters, multi-tenant.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "overrides": {
+    "ioredis": "^5.4.2"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json && tsc -p apps/web/tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run --project unit --project component",
+    "test:watch": "vitest --project unit --project component",
+    "test:integration": "vitest run --project integration",
+    "dev:api": "tsx apps/api/src/main.ts",
+    "dev:workers": "tsx apps/workers/src/main.ts",
+    "dev:scheduler": "tsx apps/scheduler/src/main.ts",
+    "dev:mcp": "tsx apps/mcp-server/src/main.ts",
+    "dev:web": "npm run dev -w @expense/web",
+    "db:generate": "npm run generate -w @expense/db",
+    "db:migrate": "npm run migrate -w @expense/db",
+    "db:push": "npm run push -w @expense/db",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "demo:replay": "tsx scripts/demo-receipt-pipeline.ts --scenario all",
+    "demo:live": "tsx scripts/demo-receipt-live.ts",
+    "scenario": "npx vitest run apps/api/e2e/scenario-runner.e2e.ts --reporter=verbose",
+    "trace": "bash scripts/trace-user.sh",
+    "mint-mcp-token": "dotenv -e .env -- tsx scripts/mint-mcp-token.ts"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.4.2",
+    "@types/node": "^22.10.5",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "^9.17.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.19.1",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "yaml": "^2.9.0"
+  }
+}
