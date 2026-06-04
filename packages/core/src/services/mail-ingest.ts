@@ -64,7 +64,9 @@ export async function ingestGmailMessage(
     fromAddress: meta.fromAddress,
     subject: meta.subject,
     outcome: classification.outcome,
-    kind: classification.kind,
+    ...(classification.outcome === "classify"
+      ? { kind: classification.kind }
+      : { reason: classification.reason }),
   });
 
   const message = await deps.mailMessages.upsertSeen({
